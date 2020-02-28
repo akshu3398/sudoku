@@ -1,0 +1,23 @@
+Requirements:
+
+python2.4
+reportlab
+Webware (for servlet)
+
+
+What's going on:
+
+index.html  - HTML form 
+generate.py - webware servlet; receives form data submitted from browser
+
+lib/        - the "lib" directory from gnome-sudoku, with modifications
+lib/generate.py - a script which pre-generates sudoku puzzles offline,
+                  and stores them in DATA_DIR (defined in lib/defaults.py)
+lib/games/      - where the pre-generated puzzles get stored
+lib/games/makeindices.sh    - a shell script which makes an index file of all
+                    the available pre-generated puzzles
+lib/printpuzzles.py - a script which can be called from the command line
+                      or imported as a module, which uses the pre-generated
+                      puzzles and generates a PDF file.
+
+
