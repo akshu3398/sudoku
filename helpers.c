@@ -135,7 +135,13 @@ draw_numbers(void)
         {
             // determine char
             char c = (g.board[i][j] == 0) ? '.' : g.board[i][j] + '0';
+            // enable color if possible and if the cell is locked
+            if (has_colors() && g.locked[i][j])
+                attron(COLOR_PAIR(PAIR_BANNER));
             mvaddch(g.top + i + 1 + i/3, g.left + 2 + 2*(j + j/3), c);
+            // enable color if possible and if the cell is locked
+            if (has_colors() && g.locked[i][j])
+                attroff(COLOR_PAIR(PAIR_BANNER));
             refresh();
         }
     }
@@ -212,6 +218,12 @@ load_board(void)
         fclose(fp);
         return false;
     }
+
+    // lock the cells in the board that came pre-filled
+    for (__uint8_t i = 0; i < 9; i++)
+        for (__uint8_t j = 0; j < 9; j++)
+            g.locked[i][j] = (g.board[i][j] != 0) ? true : false;
+    
 
     // w00t
     fclose(fp);

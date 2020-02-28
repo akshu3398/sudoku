@@ -15,7 +15,7 @@
 
 // banner's colors
 #define FG_BANNER COLOR_CYAN
-#define BG_BANNER COLOR_BLACK
+#define BG_BANNER COLOR_RED
 
 // grid's colors
 #define FG_GRID COLOR_WHITE

@@ -24,6 +24,9 @@ struct
     // the game's board
     int board[9][9];
 
+    // locked cells in the board which are immutable (lookup - python tuples)
+    bool locked[9][9];
+
     // the board's number
     int number;
 
