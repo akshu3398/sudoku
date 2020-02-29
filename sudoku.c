@@ -105,7 +105,13 @@ main(int argc, char *argv[])
         // capitalize input to simplify cases
         ch = toupper(ch);
 
-        if (!won() || tolower(ch) == 'q')
+        // play game if not won
+        if (!won() || 
+            tolower(ch) == 'q' || 
+            ch == KEY_UP || 
+            ch == KEY_DOWN || 
+            ch == KEY_LEFT || 
+            ch == KEY_RIGHT)
         {
             // process user's input
             switch (ch)

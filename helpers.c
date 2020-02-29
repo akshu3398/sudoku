@@ -138,10 +138,14 @@ draw_numbers(void)
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
                 attron((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
+            else if(!g.locked[i][j] && won())
+                attron(COLOR_PAIR(PAIR_LOGO));
             mvaddch(g.top + i + 1 + i/3, g.left + 2 + 2*(j + j/3), c);
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
                 attroff((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
+            else if(!g.locked[i][j] && won())
+                attroff(COLOR_PAIR(PAIR_LOGO));
             refresh();
         }
     }
@@ -415,25 +419,22 @@ startup(void)
 
 /* 
 * check given move validity 
+* return false if cell-number's twin found else return true
 */
 bool valid_move(int y, int x)
-{
-
-    if (!g.board[y][x])
-        return false;
-
+{ 
     // check inside cell-box
-    for (__uint8_t j = y/3, m = y/3; j < m+3; j++)
-        for (__uint8_t i = x/3, n = x/3; i < n+3; i++)
+    for (__uint8_t j = 3*ceil(y/3), m = 3*ceil(y/3); j < m+3; j++)
+        for (__uint8_t i = 3*ceil(x/3), n = 3*ceil(x/3); i < n+3; i++)
             if (g.board[j][i] == g.board[y][x] && i != x && j != y)
                 return false;
     
-    // cell-row wise
+    // check cell-row wise
     for (__uint8_t i = 0; i < 9; i++)
         if (g.board[i][x] == g.board[y][x] && i != y)
             return false;
 
-    // cell-col wise
+    // check cell-col wise
     for (__uint8_t i = 0; i < 9; i++)
         if (g.board[y][i] == g.board[y][x] && i != x)
             return false;
@@ -448,8 +449,8 @@ bool won(void)
 {
     for (size_t i = 0; i < 9; i++)
         for (size_t j = 0; j < 9; j++)
-            if (!g.locked[j][i])
-                if (!valid_move(j, i))
+            if (!g.locked[i][j])
+                if (!g.board[i][j] || !valid_move(i, j))
                     return false;
 
     return true;

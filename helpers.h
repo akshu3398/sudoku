@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <math.h>
 
 
 // macro for processing control characters
