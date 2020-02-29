@@ -54,3 +54,4 @@ void show_banner(char *b);
 void show_cursor(void);
 void shutdown(void);
 bool startup(void);
+bool valid_move(void);

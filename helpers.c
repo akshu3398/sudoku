@@ -337,18 +337,8 @@ show_cursor(void)
 void
 show_banner(char *b)
 {
-    // enable color if possible
-    if (has_colors())
-        attron(COLOR_PAIR(PAIR_BANNER));
-
     // determine where top-left corner of board belongs 
     mvaddstr(g.top + 16, g.left + 64 - strlen(b), b);
-
-    // disable color if possible
-    if (has_colors())
-        attroff(COLOR_PAIR(PAIR_BANNER));
-
-    refresh();
 }
 
 
@@ -420,5 +410,28 @@ startup(void)
     timeout(1000);
 
     // w00t
+    return true;
+}
+
+bool valid_move(void)
+{
+    // check inside cell-box
+    for (__uint8_t j = g.y/3, m = g.y/3; j < m+3; j++)
+    {
+        for (__uint8_t i = g.x/3, n = g.x/3; i < n+3; i++)
+            if (g.board[j][i] == g.board[g.y][g.x] && i != g.x && j != g.y)
+                return false;
+    }        
+    
+    // cell-row wise
+    for (__uint8_t i = 0; i < 9; i++)
+        if (g.board[i][g.x] == g.board[g.y][g.x] && i != g.y)
+            return false;
+
+    // cell-col wise
+    for (__uint8_t i = 0; i < 9; i++)
+        if (g.board[g.y][i] == g.board[g.y][g.x] && i != g.x)
+            return false;
+    
     return true;
 }

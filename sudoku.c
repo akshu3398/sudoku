@@ -165,16 +165,25 @@ main(int argc, char *argv[])
                 }
                 break;
 
-            // clear the cell where the cur is at, if possible otherwise alert the player for a wrong move
+            // clear the cell where the cur is at, if possible otherwise alert the player of a wrong move
             case KEY_BACKSPACE:
             case KEY_DC:
             case '0':
+            case '.':
                 {
                     if (!g.locked[g.y][g.x])
                         g.board[g.y][g.x] = 0;
                     else
                     {
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attron(COLOR_PAIR(PAIR_BANNER));
                         show_banner("invalid operation!");
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attroff(COLOR_PAIR(PAIR_BANNER));
+                        refresh();
+                        
                         sleep(3);
                         hide_banner();
                     }
@@ -182,7 +191,7 @@ main(int argc, char *argv[])
                 }
                 break;
 
-            // input number passed by player if possible to where cursor is at, otherwise alert the player for a wrong move
+            // update board via number passed by player if possible to where cursor is at, otherwise alert the player of a wrong move
             case '1':
             case '2':
             case '3':
@@ -194,13 +203,43 @@ main(int argc, char *argv[])
             case '9':
                 {
                     if (!g.locked[g.y][g.x])
+                    {
                         g.board[g.y][g.x] = ch - '0';
+                        // check & display move validity
+                        if (valid_move())
+                        {
+                            // enable color if possible
+                            if (has_colors())
+                                attron(COLOR_PAIR(PAIR_LOGO));
+                            show_banner("nice move!");
+                            // enable color if possible
+                            if (has_colors())
+                                attroff(COLOR_PAIR(PAIR_LOGO));
+                        }
+                        else
+                        {
+                            // enable color if possible
+                            if (has_colors())
+                                attron(COLOR_PAIR(PAIR_BANNER));
+                            show_banner("err, try again!");
+                            // enable color if possible
+                            if (has_colors())
+                                attroff(COLOR_PAIR(PAIR_BANNER));
+                        }
+                    }
                     else
                     {
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attron(COLOR_PAIR(PAIR_BANNER));
                         show_banner("invalid operation!");
-                        sleep(3);
-                        hide_banner();
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attroff(COLOR_PAIR(PAIR_BANNER));
                     }
+                    refresh();
+                    sleep(3);
+                    hide_banner();
                     redraw_all();
                 }
                 break;
@@ -214,6 +253,8 @@ main(int argc, char *argv[])
         // log input (and board's state) if any was received this iteration
         if (ch != ERR)
             log_move(ch);
+
+        // todo: check move validity
     }
     while (ch != 'Q');
 
