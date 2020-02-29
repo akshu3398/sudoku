@@ -93,26 +93,48 @@ draw_borders(void)
 void
 draw_logo(void)
 {
-    // determine top-left coordinates of logo
-    int top = g.top + 2;
-    int left = g.left + 30;
-
     // enable color if possible
     if (has_colors())
         attron(COLOR_PAIR(PAIR_LOGO));
 
-    // draw logo
-    mvaddstr(top + 0, left, "               _       _          ");
-    mvaddstr(top + 1, left, "              | |     | |         ");
-    mvaddstr(top + 2, left, " ___ _   _  __| | ___ | | ___   _ ");
-    mvaddstr(top + 3, left, "/ __| | | |/ _` |/ _ \\| |/ / | | |");
-    mvaddstr(top + 4, left, "\\__ \\ |_| | (_| | (_) |   <| |_| |");
-    mvaddstr(top + 5, left, "|___/\\__,_|\\__,_|\\___/|_|\\_\\\\__,_|");
+    if (!won())
+    {
+        // determine top-left coordinates of logo
+        int top = g.top + 2;
+        int left = g.left + 30;
 
-    // sign logo
-    char signature[3+strlen(AUTHOR)+1];
-    sprintf(signature, "by %s", AUTHOR);
-    mvaddstr(top + 7, left + 35 - strlen(signature) - 1, signature);
+        // draw logo
+        mvaddstr(top + 0, left, "               _       _          ");
+        mvaddstr(top + 1, left, "              | |     | |         ");
+        mvaddstr(top + 2, left, " ___ _   _  __| | ___ | | ___   _ ");
+        mvaddstr(top + 3, left, "/ __| | | |/ _` |/ _ \\| |/ / | | |");
+        mvaddstr(top + 4, left, "\\__ \\ |_| | (_| | (_) |   <| |_| |");
+        mvaddstr(top + 5, left, "|___/\\__,_|\\__,_|\\___/|_|\\_\\\\__,_|");
+
+        // sign logo
+        char signature[3+strlen(AUTHOR)+1];
+        sprintf(signature, "by %s", AUTHOR);
+        mvaddstr(top + 7, left + 35 - strlen(signature) - 1, signature);
+    }
+    else
+    {
+        // determine top-left coordinates of logo
+        int top = g.top + 1;
+        int left = g.left + 25;
+
+        // draw logo
+        mvaddstr(top + 0,  left, " _| || |_       / // / | | | |         ");
+        mvaddstr(top + 1,  left, "|_  __  _|_   _| |/ /  | |_| |__   ___ ");
+        mvaddstr(top + 2,  left, " _| || |_| | | | < <   | __| '_ \\ / _ \\");
+        mvaddstr(top + 3,  left, "|_  __  _| |_| | |\\ \\  | |_| | | |  __/");
+        mvaddstr(top + 4,  left, "  |_||_|  \\__,_| | \\_\\  \\__|_| |_|\\___|");
+        mvaddstr(top + 5,  left, "          _     \\_\\   _   _            ");
+        mvaddstr(top + 6,  left, "         | |         | | | |           ");
+        mvaddstr(top + 7,  left, " _      _| |__   __ _| |_| |           ");
+        mvaddstr(top + 8,  left, "\\ \\ /\\ / / '_ \\ / _` | __| |           ");
+        mvaddstr(top + 9,  left, " \\ V  V /| | | | (_| | |_|_|           ");
+        mvaddstr(top + 10, left, "  \\_/\\_/ |_| |_|\\__,_|\\__(_)           ");
+    }
 
     // disable color if possible
     if (has_colors())

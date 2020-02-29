@@ -100,9 +100,7 @@ main(int argc, char *argv[])
     do
     {
         // refresh and update the screen
-        refresh();
-        draw_numbers();
-        show_cursor();
+        redraw_all();
 
         // get user's input
         ch = getch();
@@ -237,13 +235,16 @@ main(int argc, char *argv[])
                     hide_banner();
                     break;
 
+                // fills in a blank (with a correct number) on behalf of the player
+                case 'H':
+                    // todo: hint the player
+                    break;
+                
                 // let user manually redraw screen with ctrl-L
                 case CTRL('l'):
-                    redraw_all();
-                    break;
-
                 default:
                     redraw_all();
+                    break;
             }
             g.end = time(NULL);
         }
