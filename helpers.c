@@ -178,6 +178,8 @@ hide_banner(void)
     // overwrite banner with spaces
     for (int i = 0; i < maxx; i++)
         mvaddch(g.top + 16, i, ' ');
+
+    refresh();
 }
 
 
@@ -345,6 +347,8 @@ show_banner(char *b)
     // disable color if possible
     if (has_colors())
         attroff(COLOR_PAIR(PAIR_BANNER));
+
+    refresh();
 }
 
 

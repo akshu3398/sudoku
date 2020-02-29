@@ -165,25 +165,24 @@ main(int argc, char *argv[])
                 }
                 break;
 
-            // clear the cell where the cur is at if possible
+            // clear the cell where the cur is at, if possible otherwise alert the player for a wrong move
             case KEY_BACKSPACE:
             case KEY_DC:
             case '0':
                 {
-                    // todo: display banner alerting player for the wrong move
-                    hide_banner();
                     if (!g.locked[g.y][g.x])
                         g.board[g.y][g.x] = 0;
                     else
                     {
-                        draw_grid();
                         show_banner("invalid operation!");
+                        sleep(3);
+                        hide_banner();
                     }
                     redraw_all();
                 }
                 break;
 
-            // input number passed by player if possible to where cursor is at
+            // input number passed by player if possible to where cursor is at, otherwise alert the player for a wrong move
             case '1':
             case '2':
             case '3':
@@ -194,14 +193,13 @@ main(int argc, char *argv[])
             case '8':
             case '9':
                 {
-                    // todo: display banner alerting player for the wrong move
-                    hide_banner();
                     if (!g.locked[g.y][g.x])
                         g.board[g.y][g.x] = ch - '0';
                     else
                     {
-                        draw_grid();
                         show_banner("invalid operation!");
+                        sleep(3);
+                        hide_banner();
                     }
                     redraw_all();
                 }
