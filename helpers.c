@@ -30,10 +30,10 @@ draw_grid(void)
     }
     mvaddstr(g.top + 4 * 3, g.left, "+-------+-------+-------+" );
 
-    // remind user of level and #
+    // remind user of level and # and also the time elapsed since beginning of the game.
     char reminder[maxx+1];
-    sprintf(reminder, "   playing %s #%d", g.level, g.number);
-    mvaddstr(g.top + 14, g.left + 25 - strlen(reminder), reminder);
+    sprintf(reminder, "   playing %s #%d, time elapsed: %ld seconds", g.level, g.number, (g.end - g.current));
+    mvaddstr(g.top + 14, g.left + 50 - strlen(reminder), reminder);
 
     // disable color if possible
     if (has_colors())
@@ -138,12 +138,14 @@ draw_numbers(void)
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
                 attron((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
+            // enable game winning texture if won
             else if(!g.locked[i][j] && won())
                 attron(COLOR_PAIR(PAIR_LOGO));
             mvaddch(g.top + i + 1 + i/3, g.left + 2 + 2*(j + j/3), c);
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
                 attroff((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
+            // enable game winning texture if won
             else if(!g.locked[i][j] && won())
                 attroff(COLOR_PAIR(PAIR_LOGO));
             refresh();

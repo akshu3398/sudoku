@@ -37,6 +37,9 @@ struct
 
     // the cursor's current location between (0,0) and (8,8)
     int y, x;
+
+    // keep record of the time
+    time_t current, end;
 } g;
 
 

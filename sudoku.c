@@ -92,12 +92,17 @@ main(int argc, char *argv[])
     }
     redraw_all();
 
+    // start the clock
+    g.current = time(NULL);
+
     // let the user play!
     int ch;
     do
     {
-        // refresh the screen
+        // refresh and update the screen
         refresh();
+        draw_numbers();
+        show_cursor();
 
         // get user's input
         ch = getch();
@@ -105,13 +110,11 @@ main(int argc, char *argv[])
         // capitalize input to simplify cases
         ch = toupper(ch);
 
-        // play game if not won
+        // play game if it is yet to be won
         if (!won() || 
             tolower(ch) == 'q' || 
-            ch == KEY_UP || 
-            ch == KEY_DOWN || 
-            ch == KEY_LEFT || 
-            ch == KEY_RIGHT)
+            ch == KEY_UP || ch == KEY_DOWN || 
+            ch == KEY_LEFT || ch == KEY_RIGHT)
         {
             // process user's input
             switch (ch)
@@ -140,37 +143,25 @@ main(int argc, char *argv[])
                 // move the cur upwards one unit if it doesn't reach edge
                 case KEY_UP:
                 case 'W':
-                    {
-                        g.y = !(g.y-1 <= 0) ? g.y-1: 0;
-                        show_cursor();
-                    }
+                    g.y = !(g.y-1 <= 0) ? g.y-1: 0;
                     break;
 
                 // move the cur downwards one unit if it doesn't reach edge
                 case KEY_DOWN:
                 case 'S':
-                    {
-                        g.y = !(g.y+1 >= 8) ? g.y+1: 8;
-                        show_cursor();
-                    }
+                    g.y = !(g.y+1 >= 8) ? g.y+1: 8;
                     break;
 
                 // move the cur leftwards one unit if it doesn't reach edge
                 case KEY_LEFT:
                 case 'A':
-                    {
-                        g.x = !(g.x-1 <= 0) ? g.x-1: 0;
-                        show_cursor();
-                    }
+                    g.x = !(g.x-1 <= 0) ? g.x-1: 0;
                     break;
 
                 // move the cur rightwards one unit if it doesn't reach edge
                 case KEY_RIGHT:
                 case 'D':
-                    {
-                        g.x = !(g.x+1 >= 8) ? g.x+1: 8;
-                        show_cursor();
-                    }
+                    g.x = !(g.x+1 >= 8) ? g.x+1: 8;
                     break;
 
                 // clear the cell where the cur is at, if possible otherwise alert the player of a wrong move
@@ -178,24 +169,21 @@ main(int argc, char *argv[])
                 case KEY_DC:
                 case '0':
                 case '.':
+                    if (!g.locked[g.y][g.x])
+                        g.board[g.y][g.x] = 0;
+                    else
                     {
-                        if (!g.locked[g.y][g.x])
-                            g.board[g.y][g.x] = 0;
-                        else
-                        {
-                            // enable color if possible and if the cell is locked
-                            if (has_colors())
-                                attron(COLOR_PAIR(PAIR_BANNER));
-                            show_banner("invalid operation!");
-                            // enable color if possible and if the cell is locked
-                            if (has_colors())
-                                attroff(COLOR_PAIR(PAIR_BANNER));
-                            refresh();
-                            
-                            sleep(3);
-                            hide_banner();
-                        }
-                        redraw_all();
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attron(COLOR_PAIR(PAIR_BANNER));
+                        show_banner("invalid operation!");
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attroff(COLOR_PAIR(PAIR_BANNER));
+                        refresh();
+                        
+                        sleep(3);
+                        hide_banner();
                     }
                     break;
 
@@ -209,54 +197,55 @@ main(int argc, char *argv[])
                 case '7':
                 case '8':
                 case '9':
+                    if (!g.locked[g.y][g.x])
                     {
-                        if (!g.locked[g.y][g.x])
+                        g.board[g.y][g.x] = ch - '0';
+                        // check & display move validity
+                        if (valid_move(g.y, g.x))
                         {
-                            g.board[g.y][g.x] = ch - '0';
-                            // check & display move validity
-                            if (valid_move(g.y, g.x))
-                            {
-                                // enable color if possible
-                                if (has_colors())
-                                    attron(COLOR_PAIR(PAIR_LOGO));
-                                show_banner("nice move!");
-                                // enable color if possible
-                                if (has_colors())
-                                    attroff(COLOR_PAIR(PAIR_LOGO));
-                            }
-                            else
-                            {
-                                // enable color if possible
-                                if (has_colors())
-                                    attron(COLOR_PAIR(PAIR_BANNER));
-                                show_banner("err, try again!");
-                                // enable color if possible
-                                if (has_colors())
-                                    attroff(COLOR_PAIR(PAIR_BANNER));
-                            }
+                            // enable color if possible
+                            if (has_colors())
+                                attron(COLOR_PAIR(PAIR_LOGO));
+                            show_banner("nice move!");
+                            // enable color if possible
+                            if (has_colors())
+                                attroff(COLOR_PAIR(PAIR_LOGO));
                         }
                         else
                         {
-                            // enable color if possible and if the cell is locked
+                            // enable color if possible
                             if (has_colors())
                                 attron(COLOR_PAIR(PAIR_BANNER));
-                            show_banner("invalid operation!");
-                            // enable color if possible and if the cell is locked
+                            show_banner("err, try again!");
+                            // enable color if possible
                             if (has_colors())
                                 attroff(COLOR_PAIR(PAIR_BANNER));
                         }
-                        refresh();
-                        sleep(3);
-                        hide_banner();
-                        redraw_all();
                     }
+                    else
+                    {
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attron(COLOR_PAIR(PAIR_BANNER));
+                        show_banner("invalid operation!");
+                        // enable color if possible and if the cell is locked
+                        if (has_colors())
+                            attroff(COLOR_PAIR(PAIR_BANNER));
+                    }
+                    refresh();
+                    sleep(3);
+                    hide_banner();
                     break;
 
                 // let user manually redraw screen with ctrl-L
                 case CTRL('l'):
                     redraw_all();
                     break;
+
+                default:
+                    redraw_all();
             }
+            g.end = time(NULL);
         }
 
         // log input (and board's state) if any was received this iteration
