@@ -105,156 +105,157 @@ main(int argc, char *argv[])
         // capitalize input to simplify cases
         ch = toupper(ch);
 
-        // process user's input
-        switch (ch)
+        if (!won() || tolower(ch) == 'q')
         {
-            // start a new game
-            case 'N': 
-                g.number = rand() % max + 1;
-                if (!restart_game())
-                {
-                    shutdown();
-                    fprintf(stderr, "Could not load board from disk!\n");
-                    return 6;
-                }
-                break;
-
-            // restart current game
-            case 'R': 
-                if (!restart_game())
-                {
-                    shutdown();
-                    fprintf(stderr, "Could not load board from disk!\n");
-                    return 6;
-                }
-                break;
-
-            // move the cur upwards one unit if it doesn't reach edge
-            case KEY_UP:
-            case 'W':
-                {
-                    g.y = !(g.y-1 <= 0) ? g.y-1: 0;
-                    show_cursor();
-                }
-                break;
-
-            // move the cur downwards one unit if it doesn't reach edge
-            case KEY_DOWN:
-            case 'S':
-                {
-                    g.y = !(g.y+1 >= 8) ? g.y+1: 8;
-                    show_cursor();
-                }
-                break;
-
-            // move the cur leftwards one unit if it doesn't reach edge
-            case KEY_LEFT:
-            case 'A':
-                {
-                    g.x = !(g.x-1 <= 0) ? g.x-1: 0;
-                    show_cursor();
-                }
-                break;
-
-            // move the cur rightwards one unit if it doesn't reach edge
-            case KEY_RIGHT:
-            case 'D':
-                {
-                    g.x = !(g.x+1 >= 8) ? g.x+1: 8;
-                    show_cursor();
-                }
-                break;
-
-            // clear the cell where the cur is at, if possible otherwise alert the player of a wrong move
-            case KEY_BACKSPACE:
-            case KEY_DC:
-            case '0':
-            case '.':
-                {
-                    if (!g.locked[g.y][g.x])
-                        g.board[g.y][g.x] = 0;
-                    else
+            // process user's input
+            switch (ch)
+            {
+                // start a new game
+                case 'N': 
+                    g.number = rand() % max + 1;
+                    if (!restart_game())
                     {
-                        // enable color if possible and if the cell is locked
-                        if (has_colors())
-                            attron(COLOR_PAIR(PAIR_BANNER));
-                        show_banner("invalid operation!");
-                        // enable color if possible and if the cell is locked
-                        if (has_colors())
-                            attroff(COLOR_PAIR(PAIR_BANNER));
-                        refresh();
-                        
-                        sleep(3);
-                        hide_banner();
+                        shutdown();
+                        fprintf(stderr, "Could not load board from disk!\n");
+                        return 6;
                     }
-                    redraw_all();
-                }
-                break;
+                    break;
 
-            // update board via number passed by player if possible to where cursor is at, otherwise alert the player of a wrong move
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                {
-                    if (!g.locked[g.y][g.x])
+                // restart current game
+                case 'R': 
+                    if (!restart_game())
                     {
-                        g.board[g.y][g.x] = ch - '0';
-                        // check & display move validity
-                        if (valid_move())
+                        shutdown();
+                        fprintf(stderr, "Could not load board from disk!\n");
+                        return 6;
+                    }
+                    break;
+
+                // move the cur upwards one unit if it doesn't reach edge
+                case KEY_UP:
+                case 'W':
+                    {
+                        g.y = !(g.y-1 <= 0) ? g.y-1: 0;
+                        show_cursor();
+                    }
+                    break;
+
+                // move the cur downwards one unit if it doesn't reach edge
+                case KEY_DOWN:
+                case 'S':
+                    {
+                        g.y = !(g.y+1 >= 8) ? g.y+1: 8;
+                        show_cursor();
+                    }
+                    break;
+
+                // move the cur leftwards one unit if it doesn't reach edge
+                case KEY_LEFT:
+                case 'A':
+                    {
+                        g.x = !(g.x-1 <= 0) ? g.x-1: 0;
+                        show_cursor();
+                    }
+                    break;
+
+                // move the cur rightwards one unit if it doesn't reach edge
+                case KEY_RIGHT:
+                case 'D':
+                    {
+                        g.x = !(g.x+1 >= 8) ? g.x+1: 8;
+                        show_cursor();
+                    }
+                    break;
+
+                // clear the cell where the cur is at, if possible otherwise alert the player of a wrong move
+                case KEY_BACKSPACE:
+                case KEY_DC:
+                case '0':
+                case '.':
+                    {
+                        if (!g.locked[g.y][g.x])
+                            g.board[g.y][g.x] = 0;
+                        else
                         {
-                            // enable color if possible
+                            // enable color if possible and if the cell is locked
                             if (has_colors())
-                                attron(COLOR_PAIR(PAIR_LOGO));
-                            show_banner("nice move!");
-                            // enable color if possible
+                                attron(COLOR_PAIR(PAIR_BANNER));
+                            show_banner("invalid operation!");
+                            // enable color if possible and if the cell is locked
                             if (has_colors())
-                                attroff(COLOR_PAIR(PAIR_LOGO));
+                                attroff(COLOR_PAIR(PAIR_BANNER));
+                            refresh();
+                            
+                            sleep(3);
+                            hide_banner();
+                        }
+                        redraw_all();
+                    }
+                    break;
+
+                // update board via number passed by player if possible to where cursor is at, otherwise alert the player of a wrong move
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    {
+                        if (!g.locked[g.y][g.x])
+                        {
+                            g.board[g.y][g.x] = ch - '0';
+                            // check & display move validity
+                            if (valid_move(g.y, g.x))
+                            {
+                                // enable color if possible
+                                if (has_colors())
+                                    attron(COLOR_PAIR(PAIR_LOGO));
+                                show_banner("nice move!");
+                                // enable color if possible
+                                if (has_colors())
+                                    attroff(COLOR_PAIR(PAIR_LOGO));
+                            }
+                            else
+                            {
+                                // enable color if possible
+                                if (has_colors())
+                                    attron(COLOR_PAIR(PAIR_BANNER));
+                                show_banner("err, try again!");
+                                // enable color if possible
+                                if (has_colors())
+                                    attroff(COLOR_PAIR(PAIR_BANNER));
+                            }
                         }
                         else
                         {
-                            // enable color if possible
+                            // enable color if possible and if the cell is locked
                             if (has_colors())
                                 attron(COLOR_PAIR(PAIR_BANNER));
-                            show_banner("err, try again!");
-                            // enable color if possible
+                            show_banner("invalid operation!");
+                            // enable color if possible and if the cell is locked
                             if (has_colors())
                                 attroff(COLOR_PAIR(PAIR_BANNER));
                         }
+                        refresh();
+                        sleep(3);
+                        hide_banner();
+                        redraw_all();
                     }
-                    else
-                    {
-                        // enable color if possible and if the cell is locked
-                        if (has_colors())
-                            attron(COLOR_PAIR(PAIR_BANNER));
-                        show_banner("invalid operation!");
-                        // enable color if possible and if the cell is locked
-                        if (has_colors())
-                            attroff(COLOR_PAIR(PAIR_BANNER));
-                    }
-                    refresh();
-                    sleep(3);
-                    hide_banner();
-                    redraw_all();
-                }
-                break;
+                    break;
 
-            // let user manually redraw screen with ctrl-L
-            case CTRL('l'):
-                redraw_all();
-                break;
+                // let user manually redraw screen with ctrl-L
+                case CTRL('l'):
+                    redraw_all();
+                    break;
+            }
         }
 
         // log input (and board's state) if any was received this iteration
         if (ch != ERR)
             log_move(ch);
-
-        // todo: check move validity
     }
     while (ch != 'Q');
 

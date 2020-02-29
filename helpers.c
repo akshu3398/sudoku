@@ -137,11 +137,11 @@ draw_numbers(void)
             char c = (g.board[i][j] == 0) ? '.' : g.board[i][j] + '0';
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
-                attron(COLOR_PAIR(PAIR_BANNER));
+                attron((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
             mvaddch(g.top + i + 1 + i/3, g.left + 2 + 2*(j + j/3), c);
             // enable color if possible and if the cell is locked
             if (has_colors() && g.locked[i][j])
-                attroff(COLOR_PAIR(PAIR_BANNER));
+                attroff((!won()) ? COLOR_PAIR(PAIR_BANNER) : COLOR_PAIR(PAIR_LOGO));
             refresh();
         }
     }
@@ -413,25 +413,44 @@ startup(void)
     return true;
 }
 
-bool valid_move(void)
+/* 
+* check given move validity 
+*/
+bool valid_move(int y, int x)
 {
+
+    if (!g.board[y][x])
+        return false;
+
     // check inside cell-box
-    for (__uint8_t j = g.y/3, m = g.y/3; j < m+3; j++)
-    {
-        for (__uint8_t i = g.x/3, n = g.x/3; i < n+3; i++)
-            if (g.board[j][i] == g.board[g.y][g.x] && i != g.x && j != g.y)
+    for (__uint8_t j = y/3, m = y/3; j < m+3; j++)
+        for (__uint8_t i = x/3, n = x/3; i < n+3; i++)
+            if (g.board[j][i] == g.board[y][x] && i != x && j != y)
                 return false;
-    }        
     
     // cell-row wise
     for (__uint8_t i = 0; i < 9; i++)
-        if (g.board[i][g.x] == g.board[g.y][g.x] && i != g.y)
+        if (g.board[i][x] == g.board[y][x] && i != y)
             return false;
 
     // cell-col wise
     for (__uint8_t i = 0; i < 9; i++)
-        if (g.board[g.y][i] == g.board[g.y][g.x] && i != g.x)
+        if (g.board[y][i] == g.board[y][x] && i != x)
             return false;
     
+    return true;
+}
+
+/* 
+* check if the given board is completed and game is won 
+*/
+bool won(void)
+{
+    for (size_t i = 0; i < 9; i++)
+        for (size_t j = 0; j < 9; j++)
+            if (!g.locked[j][i])
+                if (!valid_move(j, i))
+                    return false;
+
     return true;
 }
