@@ -197,10 +197,10 @@ main(int argc, char *argv[])
                 case '9':
                     if (!g.locked[g.y][g.x])
                     {
-                        g.board[g.y][g.x] = ch - '0';
-                        // check & display move validity
-                        if (valid_move(g.y, g.x))
+                        // check, update & display move validity
+                        if (valid_move(g.y, g.x, (int)(ch - '0')))
                         {
+                            g.board[g.y][g.x] = ch - '0';
                             // enable color if possible
                             if (has_colors())
                                 attron(COLOR_PAIR(PAIR_LOGO));
@@ -237,7 +237,8 @@ main(int argc, char *argv[])
 
                 // fills in a blank (with a correct number) on behalf of the player
                 case 'H':
-                    // todo: hint the player
+                    // display a rough hint
+                    hint();
                     break;
                 
                 // let user manually redraw screen with ctrl-L

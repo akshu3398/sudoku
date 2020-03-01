@@ -74,7 +74,7 @@ draw_borders(void)
     mvaddstr(0, (maxx - strlen(header)) / 2, header);
 
     // draw footer
-    mvaddstr(maxy-1, 1, "[N]ew Game   [R]estart Game");
+    mvaddstr(maxy-1, 1, "[N]ew Game   [R]estart Game, [H]int");
     mvaddstr(maxy-1, maxx-13, "[Q]uit Game");
 
     // disable color if possible (else b&w highlighting)
@@ -298,7 +298,6 @@ redraw_all(void)
 {
     // reset ncurses
     endwin();
-    refresh();
 
     // clear screen
     clear();
@@ -311,6 +310,9 @@ redraw_all(void)
 
     // show cursor
     show_cursor();
+    
+    // update display
+    refresh();
 }
 
 
@@ -444,23 +446,24 @@ startup(void)
 /* 
 * check given move validity 
 * return false if cell-number's twin found else return true
+* input: (int)y ∈ [0, 9), (int)x ∈ [0, 9), (int)num ∈ [1, 9]
 */
-bool valid_move(int y, int x)
+bool valid_move(int y, int x, int num)
 { 
     // check inside cell-box
     for (__uint8_t j = 3*ceil(y/3), m = 3*ceil(y/3); j < m+3; j++)
         for (__uint8_t i = 3*ceil(x/3), n = 3*ceil(x/3); i < n+3; i++)
-            if (g.board[j][i] == g.board[y][x] && i != x && j != y)
+            if (g.board[j][i] == num && i != x && j != y)
                 return false;
     
     // check cell-row wise
     for (__uint8_t i = 0; i < 9; i++)
-        if (g.board[i][x] == g.board[y][x] && i != y)
+        if (g.board[i][x] == num && i != y)
             return false;
 
     // check cell-col wise
     for (__uint8_t i = 0; i < 9; i++)
-        if (g.board[y][i] == g.board[y][x] && i != x)
+        if (g.board[y][i] == num && i != x)
             return false;
     
     return true;
@@ -474,8 +477,100 @@ bool won(void)
     for (size_t i = 0; i < 9; i++)
         for (size_t j = 0; j < 9; j++)
             if (!g.locked[i][j])
-                if (!g.board[i][j] || !valid_move(i, j))
+                if (!g.board[i][j] || !valid_move(i, j, g.board[i][j]))
                     return false;
 
     return true;
+}
+
+/* 
+* [H]int feature: whereby hitting 'H' fills in a blank(with a correct number) on behalf of the player each time that its called during play 
+*/
+void hint(void)
+{
+    char message[60];
+    // for every playable number find the possible places where it can & can't be inserted
+    bool numPlaces[9][9][9];
+    __uint8_t numCntr;
+    // for every cell in the board check if the num is playable & 
+    // update its possibility into numPlaces
+    for (__uint8_t num = 1; num <= 9; num++)
+        for (__uint8_t i = 0; i < 9; i++)
+            for (__uint8_t j = 0; j < 9; j++)
+                numPlaces[num-1][i][j] = (!g.board[i][j] && valid_move(i, j, num));
+
+    // for every cell in the board
+    for (__uint8_t k = 1; k <= 9; k++)
+    {
+        // find and display hint for this num block wise
+        for (__uint8_t num = 1; num <= 9; num++)
+            if (pos_asPer_probability(numPlaces[num-1], num))
+                return;
+        
+
+        // find and display hint for this num row-col wise
+        for (__uint8_t i = 0; i < 9; i++)
+            for (__uint8_t j = 0; j < 9; j++)
+            {
+                // find and display a place where minimum number of solutions exists
+                numCntr = 0;
+                for (__uint8_t num = 0; num < 9; num++)
+                    numCntr += (numPlaces[num][i][j] != 0 && !g.board[i][j]) ? 1 : 0;
+                
+                if (numCntr <= k && numCntr > 0)
+                {
+                    // enable color if possible
+                    if (has_colors())
+                        attron(COLOR_PAIR(PAIR_LOGO));
+                    sprintf(message, "only %d number/s possible in the cell(%d, %d)", numCntr, i+1, j+1);
+                    show_banner(message);
+                    // enable color if possible
+                    if (has_colors())
+                        attroff(COLOR_PAIR(PAIR_LOGO));
+                    refresh();
+                    sleep(3);
+                    hide_banner();
+                    return;
+                }
+            }
+    }
+}
+
+/* 
+* display the position of num as per the it's probability 
+* input: (bool[9][9] array)probability space, (uint)num for hint
+*/
+bool pos_asPer_probability(bool numPlaces[9][9], __uint8_t num)
+{
+    char message[40];
+    // for each sub box/block
+    __uint8_t numPossibilities = 0;
+    for (__uint8_t i = 0; i < 3; i++)
+        for (__uint8_t j = 0; j < 3; j++)
+        {
+            // find first box/block which has only one possible place for our number
+            numPossibilities = 0;
+            for (__uint8_t x = 3*i + 0; x < 3*i + 3; x++)
+                for (__uint8_t y = 3*j + 0; y < 3*j + 3; y++)
+                    numPossibilities += (int)numPlaces[x][y];
+
+            // if the subbox contains exactly probability number of places for our number
+            // hint the player the last position of this number by printing to the screen
+            if (numPossibilities == 1)
+            {
+                // enable color if possible
+                if (has_colors())
+                    attron(COLOR_PAIR(PAIR_LOGO));
+                sprintf(message, "place %d in the box(%d, %d)", num, i+1, j+1);
+                show_banner(message);
+                // enable color if possible
+                if (has_colors())
+                    attroff(COLOR_PAIR(PAIR_LOGO));
+                refresh();
+                sleep(3);
+                hide_banner();
+                return true;
+            }
+        }
+    return false;
 }

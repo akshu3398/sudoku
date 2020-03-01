@@ -58,5 +58,7 @@ void show_banner(char *b);
 void show_cursor(void);
 void shutdown(void);
 bool startup(void);
-bool valid_move(int y, int x);
+bool valid_move(int y, int x, int num);
 bool won(void);
+void hint(void);
+bool pos_asPer_probability(bool numPlaces[9][9], __uint8_t num);
