@@ -93,7 +93,7 @@ main(int argc, char *argv[])
     redraw_all();
 
     // start the clock
-    g.current = time(NULL);
+    g.start = time(NULL);
 
     // let the user play!
     int ch;
@@ -241,13 +241,18 @@ main(int argc, char *argv[])
                     hint();
                     break;
                 
+                case 'U':
+                case CTRL('z'):
+                    // todo: undo last change
+                    break;
+
                 // let user manually redraw screen with ctrl-L
                 case CTRL('l'):
                 default:
                     redraw_all();
                     break;
             }
-            g.end = time(NULL);
+            g.current = time(NULL);
         }
 
         // log input (and board's state) if any was received this iteration

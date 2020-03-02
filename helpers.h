@@ -39,7 +39,7 @@ struct
     int y, x;
 
     // keep record of the time
-    time_t current, end;
+    time_t current, start;
 } g;
 
 

@@ -32,7 +32,11 @@ draw_grid(void)
 
     // remind user of level and # and also the time elapsed since beginning of the game.
     char reminder[maxx+1];
-    sprintf(reminder, "   playing %s #%d, time elapsed: %ld seconds", g.level, g.number, (g.end - g.current));
+    sprintf(reminder, "playing %s #%d, time elapsed: %d:%d:%d", 
+            g.level, g.number, 
+            (int)ceil((g.current - g.start)/3600),
+            ((int)ceil((g.current - g.start)/60))%60, 
+            (int)(g.current - g.start)%60);
     mvaddstr(g.top + 14, g.left + 50 - strlen(reminder), reminder);
 
     // disable color if possible
