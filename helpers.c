@@ -127,12 +127,12 @@ draw_logo(void)
         int left = g.left + 25;
 
         // draw logo
-        mvaddstr(top + 0,  left, " _| || |_       / // / | | | |         ");
-        mvaddstr(top + 1,  left, "|_  __  _|_   _| |/ /  | |_| |__   ___ ");
-        mvaddstr(top + 2,  left, " _| || |_| | | | < <   | __| '_ \\ / _ \\");
-        mvaddstr(top + 3,  left, "|_  __  _| |_| | |\\ \\  | |_| | | |  __/");
+        mvaddstr(top + 0,  left,  " _| || |_       / // / | | | |         ");
+        mvaddstr(top + 1,  left,  "|_  __  _|_   _| |/ /  | |_| |__   ___ ");
+        mvaddstr(top + 2,  left,  " _| || |_| | | | < <   | __| '_ \\ / _ \\");
+        mvaddstr(top + 3,  left,  "|_  __  _| |_| | |\\ \\  | |_| | | |  __/");
         mvaddstr(top + 4,  left, "  |_||_|  \\__,_| | \\_\\  \\__|_| |_|\\___|");
-        mvaddstr(top + 5,  left, "          _     \\_\\   _   _            ");
+        mvaddstr(top + 5,  left,  "          _     \\_\\   _   _            ");
         mvaddstr(top + 6,  left, "         | |         | | | |           ");
         mvaddstr(top + 7,  left, " _      _| |__   __ _| |_| |           ");
         mvaddstr(top + 8,  left, "\\ \\ /\\ / / '_ \\ / _` | __| |           ");
